@@ -14,7 +14,7 @@ var convert_urls = config.has('guild.motd_convert_urls') ? config.get('guild.mot
 var excluded_subdomains = config.has('guild.motd_excluded_subdomains') ? config.get('guild.motd_excluded_subdomains') : [];
 
 function messageReceived(message) {
-	if (! message.channel.isPrivate) return;
+	if (! message.channel.type === 'dm') return;
 	if (message.content.match(new RegExp("^!?"+phrases.get("MOTD_REFRESH")+'$', 'i'))) {
 		message.channel.startTyping(function() {
 			gw2.request('/v2/guild/'+guild_id+'/log', guild_key, function(err) {

@@ -12,8 +12,9 @@ var features = config.has('features.enabled') ? config.get('features.enabled').s
 gw2.setLanguage(language);
 
 console.log('Use this link to add the bot to a discord server: https://discordapp.com/oauth2/authorize?client_id='+config.get('discord.clientid')+'&scope=bot&permissions=8');
-var bot = new Discord.Client({ autoReconnect: true });
-bot.setMaxListeners(Infinity);
+//var bot = new Discord.Client({ autoReconnect: true });
+//bot.setMaxListeners(Infinity);
+var bot = new Discord.Client();
 
 if (features.indexOf("link") === -1) features.unshift("link");
 features.forEach(feature => {
@@ -29,7 +30,7 @@ bot.on("disconnected", function() {
 });
 
 bot.on("message", function(message) {
-	if (message.content.match(new RegExp('^!'+phrases.get("CORE_HELP")+'$', 'i'))) {
+	if (message.content.match(new RegExp('^'+phrases.get("CORE_PREFIX")+phrases.get("CORE_HELP")+'$', 'i'))) {
 		var help = features.map(f => phrases.get(f.toUpperCase()+"_HELP")).filter(f => !!f).join("\n\n").trim();
 		message.author.sendMessage("```Commands```\n"+help);
 		return;
@@ -39,4 +40,4 @@ bot.on("message", function(message) {
 var token = config.get('discord.token');
 if (! token.match(/^Bot /)) token = 'Bot '+token;
 
-bot.loginWithToken(token);
+bot.login(token);

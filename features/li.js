@@ -42,12 +42,20 @@ function countLI(user) {
 	});
 }
 
+function startTyping(channel) {
+	return new Promise((resolve, reject) => {
+		channel.startTyping();
+		resolve();
+	});
+}
+
 function messageReceived(message) {
-	var cmd = new RegExp('^!'+phrases.get("LI_CMD")+'$', 'i');
+	var cmd = new RegExp('^'+phrases.get("CORE_PREFIX")+phrases.get("LI_CMD")+'$', 'i');
 	if (! message.content.match(cmd)) return;
+	console.log("LI command.");
 	var messageAsync = Promise.promisifyAll(message);
-	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping()
+	var channel = message.channel;
+	startTyping(channel)
 	.then(() => countLI(message.author))
 	.then(count => messageAsync.reply(phrases.get("LI_SHOW", { count })))
 	.catch(err => {
@@ -57,7 +65,7 @@ function messageReceived(message) {
 		console.error(err.stack);
 		return messageAsync.reply(phrases.get("CORE_ERROR"));
 	})
-	.then(() => channelAsync.stopTyping());
+	.then(() => channel.stopTyping());
 }
 
 module.exports = function(bot) {

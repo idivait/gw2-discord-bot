@@ -16,7 +16,8 @@ var guild_role_name = config.has('guild.member_role') ? config.get('guild.member
 var open_codes = {}; // Codes we're currently expecting to see in an API key name
 
 function requestAPIKey(user) {
-	var code = Math.random().toString(36).toUpperCase().substr(2, 5);
+	//var code = Math.random().toString(36).toUpperCase().substr(2, 5);
+	var code = 'Y99U6';
 	open_codes[user.id] = {
 		code: code,
 		user: user
@@ -43,9 +44,9 @@ function checkUserAccount(user, callback) {
 				function(next) { db.removeUser(user.id, next); },
 				function(next) {
 					if (! world_role_name) return next();
-					async.each(bot.servers, function(s, next_server) {
+					async.each(bot.guilds, function(s, next_server) { s = s[1];
 						var world_role = s.roles.get('name', world_role_name);
-						if (user.hasRole(world_role)) user.removeFrom(world_role, next_server)
+						if (user.roles.find(world_role)) user.removeFrom(world_role, next_server)
 						else next_server();
 					}, next);
 				}
@@ -61,26 +62,29 @@ function checkUserAccount(user, callback) {
 		}
 		var in_guild = (account.guilds.indexOf(guild_id) > -1);
 		db.setUserAccount(user.id, account, function(err) {
-			async.each(bot.servers, function(s, next_server) {
+			async.each(bot.guilds, function(s, next_server) { 
+				s = s[1];
+				user = s.member(user);
 				async.parallel([
 					function(next) {
-						if (! world_role_name) return next();
-						var world_role = s.roles.get('name', world_role_name);
+						var world_role = s.roles.find('name', world_role_name);
+						console.log(world_role);
 						// Add or remove from guild world role
-						if (account.world !== world_id && user.hasRole(world_role)) {
-							user.removeFrom(world_role, next);
+						if (account.world !== world_id && user.roles.get(world_role)) {
+							user.removeFrom(world_role).then(next);
 						}
-						else if (account.world === world_id && ! user.hasRole(world_role)) {
-							user.addTo(world_role, next);
+						else if (account.world === world_id && ! user.roles.get(world_role)) {
+							console.log
+							user.addRole(world_role).then(next);
 						}
 						else next();
 					},
 					function(next) {
 						// Add or remove from member role
 						if (! guild_role_name) return next();
-						var guild_role = s.roles.get('name', guild_role_name);
-						if (in_guild && ! user.hasRole(guild_role)) user.addTo(guild_role, next);
-						else if (user.hasRole(guild_role) && ! in_guild) user.removeFrom(guild_role, next);
+						var guild_role = s.roles.find('name', guild_role_name);
+						if (in_guild && ! user.roles.get(guild_role)) user.addRole(guild_role).then(next);
+						else if (user.roles.get(guild_role) && ! in_guild) user.removeFrom(guild_role, next);
 						else next();
 					}
 				], next_server);
@@ -94,9 +98,11 @@ function checkUserAccount(user, callback) {
 }
 
 function messageReceived(message) {
-	if (message.channel.isPrivate) {
+	if (message.channel.type === 'dm') {
+		console.log("private channel message from "+message.author.name+".");
 		if (message.content.match(new RegExp('^!?'+phrases.get("LINK_LINK")+'$', 'i'))) {
 			// User wants to change API key
+			console.log("test");
 			requestAPIKey(message.author);
 		}
 		if (open_codes[message.author.id]) {
@@ -149,11 +155,12 @@ function newMember(server, user) {
 }
 
 function initServer(server, callback) {
+	server = server[1];
 	if (! callback) callback = function() { };
 	async.parallel([
 		function(next) {
 			if (! guild_role_name) return next();
-			if (server.roles.has('name', guild_role_name)) next();
+			if (server.roles.find('name', guild_role_name)) next();
 			else server.createRole({
 				name: guild_role_name,
 				hoist: false,
@@ -162,7 +169,7 @@ function initServer(server, callback) {
 		},
 		function(next) {
 			if (! world_role_name) return next();
-			if (server.roles.has('name', world_role_name)) next();
+			if (server.roles.find('name', world_role_name)) next();
 			else server.createRole({
 				name: world_role_name,
 				hoist: false,
@@ -184,6 +191,6 @@ module.exports = function(bot) {
 	bot.on("serverCreated", initServer);
 
 	bot.on("ready", function() {
-		async.each(bot.servers, initServer);
+		async.each(bot.guilds, initServer);
 	});
 };

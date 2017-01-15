@@ -7,10 +7,8 @@ var
 
 function startTyping(channel) {
 	return new Promise((resolve, reject) => {
-		channel.startTyping(err => {
-			if (err) return reject(err);
-			resolve();
-		});
+		channel.startTyping();
+		resolve();
 	});
 }
 
@@ -96,14 +94,15 @@ function getEquipString(character) {
 }
 
 function messageReceived(message) {
-	var traits_cmd = new RegExp('^!('+phrases.get("BUILDS_BUILD")+') (.+?)(?:\\s+(pve|wvw|pvp))?$', 'i');
-	var equip_cmd = new RegExp('^!('+phrases.get("BUILDS_EQUIP")+') (.+)$', 'i');
+	var traits_cmd = new RegExp('^'+phrases.get("CORE_PREFIX")+'('+phrases.get("BUILDS_BUILD")+') (.+?)(?:\\s+(pve|wvw|pvp))?$', 'i');
+	var equip_cmd = new RegExp('^'+phrases.get("CORE_PREFIX")+'('+phrases.get("BUILDS_EQUIP")+') (.+)$', 'i');
 	var privacy_cmd = new RegExp('!('+phrases.get("BUILDS_PRIVACY")+') (.+) (private|guild|public)$', 'i');
 	var matches = message.content.match(traits_cmd) || message.content.match(equip_cmd) || message.content.match(privacy_cmd);
 	if (! matches) return;
 	var cmd = matches[1];
 	var character = matches[2].replace(/<@\d+>/, "").trim();
 	if (cmd === phrases.get("BUILDS_PRIVACY")) {
+		console.log("Privacy command.");
 		var privacy = matches[3].toLowerCase();
 		startTyping(message.channel)
 			.then(() => Promise.all([
@@ -143,6 +142,7 @@ function messageReceived(message) {
 	var permissions_needed = ['characters'];
 	if (cmd === phrases.get("BUILDS_BUILD")) permissions_needed.push("builds");
 	if (cmd === phrases.get("BUILDS_EQUIP")) permissions_needed.push("inventories");
+	console.log("Build or equip command.");
 	var preamble = startTyping(message.channel)
 		.then(() => {
 			if (message.mentions && message.mentions.length > 1) throw new Error("more than one mention");

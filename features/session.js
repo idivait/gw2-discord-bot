@@ -310,12 +310,20 @@ function presenceChanged(oldState, newState) {
 	}
 }
 
+function startTyping(channel) {
+	return new Promise((resolve, reject) => {
+		channel.startTyping();
+		resolve();
+	});
+}
+
 function messageReceived(message) {
-	var cmd = new RegExp('^!'+phrases.get("SESSION_SHOWLAST")+'$', 'i');
+	var cmd = new RegExp('^'+phrases.get("CORE_PREFIX")+phrases.get("SESSION_SHOWLAST")+'$', 'i');
 	if (! message.content.match(cmd)) return;
+	console.log("Session command.");
 	var messageAsync = Promise.promisifyAll(message);
-	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping()
+	var channel = message.channel;
+	startTyping(channel)
 	.then(() => parseSession(message.author))
 	.catch(err => {
 		if (err.message === "no session") return phrases.get("SESSION_NO_SESSION");
@@ -323,7 +331,7 @@ function messageReceived(message) {
 		return phrases.get("CORE_ERROR");
 	})
 	.then(response => messageAsync.reply(response))
-	.then(() => channelAsync.stopTyping());
+	.then(() => channel.stopTyping());
 }
 
 module.exports = function(bot) {

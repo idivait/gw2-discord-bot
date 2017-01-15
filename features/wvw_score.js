@@ -46,10 +46,10 @@ function messageReceived(message) {
 	var score_cmd = phrases.get("WVWSCORE_SCORE");
 	var relscore_cmd = phrases.get("WVWSCORE_RELSCORE");
 	var kd_cmd = phrases.get("WVWSCORE_KD");
-	if (! message.content.match(new RegExp('^!('+score_cmd+'|'+relscore_cmd+'|'+kd_cmd+')$', 'i'))) return;
+	if (! message.content.match(new RegExp('^'+phrases.get("CORE_PREFIX")+'('+score_cmd+'|'+relscore_cmd+'|'+kd_cmd+')$', 'i'))) return;
+	console.log("WvW command.");
 	async.waterfall([
-		function(next) { message.channel.startTyping(next); },
-		function(something, next) { db.getAccountByUser(message.author.id, next); },
+		function(next) { message.channel.startTyping(); db.getAccountByUser(message.author.id, next); },
 		function(account, next) {
 			if (account && account.world) return next(null, account.world);
 			next(null, guild_world);
@@ -58,6 +58,7 @@ function messageReceived(message) {
 			gw2.request('/v2/wvw/matches?world='+world, null, next, { ttl: 5000 });
 		},
 		function(match, next) {
+			console.log(match);
 			var world_ids = [].concat.apply([], Object.keys(match.all_worlds).map(c => match.all_worlds[c]));
 			gw2.getWorlds(world_ids, function(err, worlds) {
 				if (err) return next(err);
@@ -82,20 +83,19 @@ function messageReceived(message) {
 		if (err) console.log(err.message);
 		var result;
 		if (scores) {
-			if (message.content.match(new RegExp('^!'+score_cmd+'$', 'i')))
+			if (message.content.match(new RegExp('^'+phrases.get("CORE_PREFIX")+score_cmd+'$', 'i')))
 				result = scores.sort((a, b) => (b.score - a.score)).map(world => (formatWorldNames(world.names, world.color)+': '+world.score.toLocaleString()+' (+'+world.ppt+')')).join("\n");
-			else if (message.content.match(new RegExp('^!'+kd_cmd+'$', 'i')))
+			else if (message.content.match(new RegExp('^'+phrases.get("CORE_PREFIX")+kd_cmd+'$', 'i')))
 				result = scores.sort((a, b) => ((b.kills / b.deaths) - (a.kills / a.deaths))).map(world => (formatWorldNames(world.names, world.color)+': '+world.kills.toLocaleString()+'/'+world.deaths.toLocaleString()+' = '+(world.kills / world.deaths).toLocaleString())).join("\n");
-			else if (message.content.match(new RegExp('^!'+relscore_cmd+'$', 'i'))) {
+			else if (message.content.match(new RegExp('^'+phrases.get("CORE_PREFIX")+relscore_cmd+'$', 'i'))) {
 				var sorted = scores.sort((a, b) => (b.score - a.score));
 				result = sorted.map((world, index) => (formatWorldNames(world.names, world.color)+': '+((index === 0) ? world.score : world.score - sorted[index - 1].score).toLocaleString() +' (+'+world.ppt+')')).join("\n");
 			}
 		} else {
 			result = phrases.get("WVWSCORE_ERROR");
 		}
-		message.channel.stopTyping(function() {
-			message.reply("```"+result+"```");
-		});
+		message.channel.stopTyping();
+		message.reply("```"+result+"```");
 	});
 }
 

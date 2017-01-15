@@ -27,14 +27,22 @@ function htmlToMessage(html) {
 	});
 }
 
+function startTyping(channel) {
+	return new Promise((resolve, reject) => {
+		channel.startTyping();
+		resolve();
+	});
+}
+
 function messageReceived(message) {
 	const messageAsync = Promise.promisifyAll(message);
-	const channelAsync = Promise.promisifyAll(message.channel);
+	const channel = message.channel;
 
 	let match;
-	if (match = message.content.match(new RegExp(`^!${phrases.get("WIKI_WIKI")} ?(.*)?$`, "i"))) {
+	if (match = message.content.match(new RegExp(`^${phrases.get("CORE_PREFIX")+phrases.get("WIKI_WIKI")} ?(.*)?$`, "i"))) {
+		console.log("Wiki command.");
 		const terms = match[1];
-		channelAsync.startTypingAsync()
+		startTyping(channel)
 			.then(() => {
 				if (!terms) throw new Error("no title");
 
@@ -115,7 +123,7 @@ function messageReceived(message) {
 						return phrases.get("WIKI_ERROR", { error: err.message || "" });
 				}
 			})
-			.finally(() => channelAsync.stopTypingAsync())
+			.finally(() => channel.stopTyping())
 			.then(text => messageAsync.replyAsync(text));
 	}
 }
