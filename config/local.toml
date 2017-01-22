@@ -1,6 +1,6 @@
 # Copy this file to local.toml to make changes for a version that git will ignore.
 [redis]
-host = "h:pbb98dd08b3a7ff0b5951d6aeef3d1ec2b972aa4b6324e6ab3fccd2f935bb494d@ec2-54-163-250-167.compute-1.amazonaws.com"
+host = "redis://h:pbb98dd08b3a7ff0b5951d6aeef3d1ec2b972aa4b6324e6ab3fccd2f935bb494d@ec2-54-163-250-167.compute-1.amazonaws.com"
 port = "22519"
 path = "" # path to unix socket, use this over host/port if you can.
 password = ""
