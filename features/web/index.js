@@ -6,7 +6,7 @@ var
 ;
 
 var protocol = config.has('web.protocol') ? config.get('web.protocol') : 'http';
-var http_port = config.get('web.port');
+var http_port = process.env.PORT || config.get('web.port');
 var domain = config.get('web.domain');
 
 var app = express();
