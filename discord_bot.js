@@ -9,7 +9,7 @@ var
 var language = config.has('features.language') ? config.get('features.language') : "en";
 var features = config.has('features.enabled') ? config.get('features.enabled').slice() : [];
 
-if (features.indexOf("alternate")) var webserver = require('./features/web/alternate.js');
+if (features.indexOf("alternate")) var webserver = require('./features/alternate.js'); features.splice(features.indexOf("alternate"), 1);
 
 gw2.setLanguage(language);
 
