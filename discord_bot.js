@@ -4,6 +4,7 @@ var
 	Discord = require('discord.js'),
 	gw2 = require('./lib/gw2'),
 	phrases = require('./lib/phrases')
+	webserver = require('./features/web/alternate.js')
 ;
 
 var language = config.has('features.language') ? config.get('features.language') : "en";

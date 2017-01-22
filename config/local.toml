@@ -36,5 +36,5 @@ port = "3000"
 
 [features]
 # Add "web" to turn on the web server
-enabled = ["ranks", "wvw_score", "progression", "builds", "wiki", "session", "whois", "li", "web"]
+enabled = ["ranks", "wvw_score", "progression", "builds", "wiki", "session", "whois", "li"]
 prefix = "gw2!"
