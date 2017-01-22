@@ -1,9 +1,9 @@
 {
 	"LINK_LINK": "gw2!link",
-	"LINK_HELP": "**__Account Linking__**\n\n`gw2!link` - Initiate the process of adding an API key (only in direct message)",
-	"LINK_REPLY_WITH_KEY": "Please reply with a key from https://account.arena.net/applications - include the code **%{code}** in the key name field.",
+	"LINK_HELP": "**__Account Linking__**\n\n`gw2!link` - Initiate the process of adding an API key (only in direct message)\n\n`refresh members` - Run this command if your in-game roles aren't displaying.",
+	"LINK_REPLY_WITH_KEY": "Please reply to this message with an API key from https://account.arena.net/applications - name the API key **%{code}** in the name field.",
 	"LINK_ERROR": "Sorry, an error occurred. Please try again later.",
 	"LINK_KEY_DOESNT_MATCH": "The key you provided does not have the code **%{code}** in the name. Please create a new key and include the code in the key name field.",
-	"LINK_KEY_DETAILS": "The key **%{name}** has been associated with you. This key grants the following permissions: %{permissions}",
-	"LINK_WELCOME": "Welcome! Send me the message \"link\" when you are ready to apply a Guild Wars 2 API key."
+	"LINK_KEY_DETAILS": "The key **%{name}** has been associated with you. This key grants the following permissions: %{permissions}. If you still aren't assigned your in-game rank, try message me `refresh members`",
+	"LINK_WELCOME": "Welcome! Send me the message \"gw2!link\" when you are ready to apply a Guild Wars 2 API key."
 }

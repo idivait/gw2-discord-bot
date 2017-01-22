@@ -16,8 +16,8 @@ var guild_role_name = config.has('guild.member_role') ? config.get('guild.member
 var open_codes = {}; // Codes we're currently expecting to see in an API key name
 
 function requestAPIKey(user) {
-	//var code = Math.random().toString(36).toUpperCase().substr(2, 5);
-	var code = 'Y99U6';
+	var code = Math.random().toString(36).toUpperCase().substr(2, 5);
+	//var code = 'Y99U6';
 	open_codes[user.id] = {
 		code: code,
 		user: user
@@ -46,7 +46,7 @@ function checkUserAccount(user, callback) {
 					if (! world_role_name) return next();
 					async.each(bot.guilds, function(s, next_server) { s = s[1];
 						var world_role = s.roles.get('name', world_role_name);
-						if (user.roles.find(world_role)) user.removeFrom(world_role, next_server)
+						if (user.roles.get(world_role)) user.removeFrom(world_role, next_server)
 						else next_server();
 					}, next);
 				}
@@ -68,13 +68,11 @@ function checkUserAccount(user, callback) {
 				async.parallel([
 					function(next) {
 						var world_role = s.roles.find('name', world_role_name);
-						console.log(world_role);
 						// Add or remove from guild world role
 						if (account.world !== world_id && user.roles.get(world_role)) {
 							user.removeFrom(world_role).then(next);
 						}
 						else if (account.world === world_id && ! user.roles.get(world_role)) {
-							console.log
 							user.addRole(world_role).then(next);
 						}
 						else next();
@@ -86,6 +84,11 @@ function checkUserAccount(user, callback) {
 						if (in_guild && ! user.roles.get(guild_role)) user.addRole(guild_role).then(next);
 						else if (user.roles.get(guild_role) && ! in_guild) user.removeFrom(guild_role, next);
 						else next();
+					},
+					function(next){
+						gw2.request('/v2/guild/'+guild_id+'/members', guild_key, function() {
+							console.log("Called rank endpoint");
+						});
 					}
 				], next_server);
 			}, function(err) {
@@ -99,10 +102,10 @@ function checkUserAccount(user, callback) {
 
 function messageReceived(message) {
 	if (message.channel.type === 'dm') {
-		console.log("private channel message from "+message.author.name+".");
+		console.log("private channel message from "+message.author+".");
 		if (message.content.match(new RegExp('^!?'+phrases.get("LINK_LINK")+'$', 'i'))) {
 			// User wants to change API key
-			console.log("test");
+			console.log("Link initiated by "+message.author.name+".");
 			requestAPIKey(message.author);
 		}
 		if (open_codes[message.author.id]) {
@@ -145,10 +148,10 @@ function messageReceived(message) {
 }
 
 function presenceChanged(oldUser, newUser) {
-	if (oldUser.status !== 'online' && newUser.status === 'online') checkUserAccount(newUser);
+	if (oldUser.presence.status !== 'online' && newUser.presence.status === 'online') checkUserAccount(newUser);
 }
 
-function newMember(server, user) {
+function newMember(user) {
 	checkUserAccount(user, function(err, hasAccount) {
 		if (! hasAccount) user.sendMessage(phrases.get("LINK_WELCOME"));
 	});
@@ -187,7 +190,7 @@ gw2.on('/v2/account', (account, key, from_cache) => {
 module.exports = function(bot) {
 	bot.on("message", messageReceived);
 	bot.on("presence", presenceChanged);
-	//bot.on("serverNewMember", newMember);
+	bot.on("guildMemberAdd", newMember);
 	bot.on("serverCreated", initServer);
 
 	bot.on("ready", function() {

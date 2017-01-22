@@ -58,7 +58,6 @@ function messageReceived(message) {
 			gw2.request('/v2/wvw/matches?world='+world, null, next, { ttl: 5000 });
 		},
 		function(match, next) {
-			console.log(match);
 			var world_ids = [].concat.apply([], Object.keys(match.all_worlds).map(c => match.all_worlds[c]));
 			gw2.getWorlds(world_ids, function(err, worlds) {
 				if (err) return next(err);

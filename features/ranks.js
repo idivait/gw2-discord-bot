@@ -35,20 +35,21 @@ function syncMembersToRoles(server, members, ranks) {
 			var membersInRank = {};
 			ranks.forEach(r => membersInRank[r.id] = []);
 			var allMembers = [];
-			var member_role = (member_role_name) ? server.roles.get('name', member_role_name) : null;
+			var member_role = (member_role_name) ? server.roles.find('name', member_role_name) : null;
 			return Promise.all(members
 				.filter(member => server.roles.find('name', member.rank)) // Ignore rank with no corresponding role
 				.map(member => db.getUserByAccountAsync(member.name).then(user_id => {
 					if (! user_id) return;
 					allMembers.push(member.name);
 					var user = Promise.promisifyAll(server.member(bot.users.get(user_id)));
+					if (!user) return;
 					var funcs = [];
-					if (member_role && ! user.roles.find(member_role)) funcs.push(() => user.addRoleAsync(member_role));
+					if (member_role && ! user.roles.get(member_role.id)) funcs.push(() => user.addRoleAsync(member_role));
 					ranks.forEach(rank => {
 						var role = server.roles.find('name', rank.id);
 						if (rank.id === member.rank) {
 							membersInRank[member.rank].push(member.name);
-							if (! user.roles.get(role.id)) funcs.push(() => user.addRoleAsync(role));
+							if (! user.roles.get(role.id)) console.log("Added "+user.displayName+" to "+role.name); funcs.push(() => user.addRoleAsync(role).then((resolve)=>{console.log(resolve)}));
 						} else {
 							if (user.roles.get(role.id)) funcs.push(() => user.removeRoleAsync(role));
 						}
@@ -62,7 +63,7 @@ function syncMembersToRoles(server, members, ranks) {
 				var promises = [];
 				var funcs = [];
 				if (member_role) {
-					var users_with_role = server.usersWithRole(member_role);
+					var users_with_role = server.roles.get(member_role).members;
 					promises = promises.concat(
 						users_with_role.map(user =>
 							db.getAccountByUserAsync(user.id)
@@ -76,7 +77,7 @@ function syncMembersToRoles(server, members, ranks) {
 				}
 				ranks.filter(rank => server.roles.find('name', rank.id)).forEach(rank => {
 					var role = server.roles.get('name', rank.id);
-					var users_with_role = server.usersWithRole(role);
+					var users_with_role = server.roles.get(role).members;
 					promises = promises.concat(users_with_role.map(user => db.getAccountByUserAsync(user.id).then(account => {
 						var userAsync = Promise.promisifyAll(user);
 						if (! account || membersInRank[rank.id].indexOf(account.name) === -1) funcs.push(() => userAsync.removeFromAsync(role));
@@ -126,6 +127,7 @@ module.exports = function(bot) {
 	}
 	// Whenever the member list for the guild is called, update everybody's ranks
 	gw2.on('/v2/guild/'+guild_id+'/members', (members, key, from_cache) => {
+		console.log("Guild endpoint called.");
 		gw2.request('/v2/guild/'+guild_id+'/ranks', key)
 			.then(ranks => Promise.all(
 				bot.guilds.map(server => syncMembersToRoles(Promise.promisifyAll(server), members, ranks))

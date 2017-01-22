@@ -28,16 +28,17 @@ function messageReceived(message) {
 			return db.getAccountByUserAsync(user.id);
 		})
 		.then((account)=>{
+			console.log(user);
 			if (!account) throw new Error("unknown user");
 			// Construct message
-			if (user.id === message.author.id) return phrases.get("WHOIS_SELF", { account_name: account.name });
-			else return phrases.get("WHOIS_KNOWN", { user: user.mention(), account_name: account.name });
+			if (user.id === message.author.id) return phrases.get("WHOIS_SELF", { account_name: account.name }); 
+			else return phrases.get("WHOIS_KNOWN", { user: user, account_name: account.name });
 		})
 		.catch(err => {
 			// Capture errors and construct proper fail message
 			switch (err.message) {
 				case "bot user":
-					return phrases.get("WHOIS_BOT", { user: bot_user.mention() });
+					return phrases.get("WHOIS_BOT", { user: bot_user });
 				case "unknown user":
 					return phrases.get("WHOIS_UNKNOWN");
 				default:

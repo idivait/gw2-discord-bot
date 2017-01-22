@@ -62,6 +62,7 @@ function gatherData(user) {
 }
 
 function startPlaying(user) {
+	console.log(user.displayName+" started playing");
 	var session_name = session_prefix+':'+user.id;
 	var time = new Date();
 	return db.getObjectAsync(session_name)
@@ -113,8 +114,8 @@ function stopPlaying(user) {
 
 function checkUsers(users) {
 	users.forEach(user => {
-		if (! user.game) return;
-		if (user.game.name !== "Guild Wars 2") return;
+		if (! user.presence.game) return;
+		if (user.presence.game.name !== "Guild Wars 2") return;
 		startPlaying(user);
 	});
 }
@@ -287,8 +288,11 @@ function coinsToGold(coins) {
 }
 
 function presenceChanged(oldState, newState) {
+	oldState = oldState.presence;
+	newState = newState.presence;
 	var isPlaying  = (newState.game && newState.game.name === "Guild Wars 2");
 	var wasPlaying = (oldState.game && oldState.game.name === "Guild Wars 2");
+
 	if (isPlaying && ! wasPlaying) {
 		// User started playing
 		startPlaying(newState);
@@ -336,7 +340,7 @@ function messageReceived(message) {
 
 module.exports = function(bot) {
 	bot.on("ready", () => {
-		checkUsers(bot.users);
+		checkUsers(bot.guilds.first().members);
 	});
 	bot.on("presence", presenceChanged);
 	bot.on("message", messageReceived);
