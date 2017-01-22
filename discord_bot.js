@@ -3,7 +3,7 @@ var
 	config = require('config'),
 	Discord = require('discord.js'),
 	gw2 = require('./lib/gw2'),
-	phrases = require('./lib/phrases')
+	phrases = require('./lib/phrases'),
 	webserver = require('./features/web/alternate.js')
 ;
 
