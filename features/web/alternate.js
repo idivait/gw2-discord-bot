@@ -11,15 +11,8 @@ var domain = config.get('web.domain');
 var app = express();
 var http = require('http').Server(app);
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/login', (req, res) => {
-	var uri = discordAuth.getUri();
-	res.redirect(uri);
-});
-
 app.get('*', (req, res) => {
-	res.sendFile(path.join(__dirname, 'public', 'index.html'));
+	res.send("Hello World");
 });
 
 http.listen(http_port, function() {
