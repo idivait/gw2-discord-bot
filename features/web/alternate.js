@@ -1,7 +1,7 @@
 var
 	express = require('express'),
 	path = require('path'),
-	config = require('config'),
+	config = require('config')
 ;
 
 var protocol = config.has('web.protocol') ? config.get('web.protocol') : 'http';
@@ -12,9 +12,9 @@ var app = express();
 var http = require('http').Server(app);
 
 app.get('*', (req, res) => {
-	res.send("Hello World");
+	res.send("This is the home of the GW2 Discord Bot.");
 });
 
 http.listen(http_port, function() {
-	console.log('http listenting on port '+http_port+'!');
+	console.log('http listening on port '+http_port+'!');
 });
