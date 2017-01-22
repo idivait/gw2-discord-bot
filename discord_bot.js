@@ -3,12 +3,13 @@ var
 	config = require('config'),
 	Discord = require('discord.js'),
 	gw2 = require('./lib/gw2'),
-	phrases = require('./lib/phrases'),
-	webserver = require('./features/web/alternate.js')
+	phrases = require('./lib/phrases')
 ;
 
 var language = config.has('features.language') ? config.get('features.language') : "en";
 var features = config.has('features.enabled') ? config.get('features.enabled').slice() : [];
+
+if (features.indexOf("alternate")) var webserver = require('./features/web/alternate.js');
 
 gw2.setLanguage(language);
 
