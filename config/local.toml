@@ -28,6 +28,12 @@ clientid = "261654426584875010" # Used to generate a link to add the bot to a se
 client_secret = "XNrzu2acT_tujcXesWlaw2YjcIKenHAP" # Only required if "web" feature is enabled
 token = "MjYxNjU0NDI2NTg0ODc1MDEw.C1xfDg.siFxPVB4LyBYMbDMfHepPOWLJVE" # Token for your discord bot user
 
+[web]
+domain = "127.0.0.1"
+protocol = "http"
+port = "3000"
+#public_url = "https://mydomain.com/" # Use this for the public url if behind a proxy (such as nginx)
+
 [features]
 # Add "web" to turn on the web server
 enabled = ["ranks", "wvw_score", "progression", "builds", "wiki", "session", "whois", "li"]
