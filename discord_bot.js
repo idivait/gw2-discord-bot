@@ -14,9 +14,8 @@ if (features.indexOf("alternate")) var webserver = require('./features/alternate
 gw2.setLanguage(language);
 
 console.log('Use this link to add the bot to a discord server: https://discordapp.com/oauth2/authorize?client_id='+config.get('discord.clientid')+'&scope=bot&permissions=8');
-//var bot = new Discord.Client({ autoReconnect: true });
-//bot.setMaxListeners(Infinity);
 var bot = new Discord.Client();
+require('events').EventEmitter.prototype._maxListeners = 100;
 
 if (features.indexOf("link") === -1) features.unshift("link");
 features.forEach(feature => {

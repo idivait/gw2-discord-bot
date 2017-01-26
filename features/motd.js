@@ -15,7 +15,7 @@ var excluded_subdomains = config.has('guild.motd_excluded_subdomains') ? config.
 
 function messageReceived(message) {
 	if (! message.channel.type === 'dm') return;
-	if (message.content.match(new RegExp("^!?"+phrases.get("MOTD_REFRESH")+'$', 'i'))) {
+	if (message.content.match(new RegExp("^"+phrases.get("CORE_PREFIX")+phrases.get("MOTD_REFRESH")+'$', 'i'))) {
 		message.channel.startTyping(function() {
 			gw2.request('/v2/guild/'+guild_id+'/log', guild_key, function(err) {
 				message.channel.stopTyping(function() {
@@ -62,13 +62,14 @@ module.exports = function(bot) {
 				}
 			});
 		}
-
-		var channels = bot.channels.getAll('name', channel_name);
-		channels.forEach(channel => bot.setChannelTopic(channel, text));
+		var channel = bot.channels.find('name', channel_name);
+		if (channel.topic === text) return;
+		channel.setTopic(text);
+		channel.sendMessage(phrases.get("MOTD_UPDATED"));
 	});
 
 	bot.on("message", messageReceived);
 	bot.on("ready", function() {
-		gw2.keepUpdated('/v2/guild/'+guild_id+'/log', guild_key, 60 * 60 * 1000); // every hour
+		gw2.keepUpdated('/v2/guild/'+guild_id+'/log', guild_key, 10 * 60 * 1000); // every hour
 	});
 };

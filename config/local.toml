@@ -15,12 +15,17 @@ id  = "15CEC1FA-3286-40B6-B687-1E8F80970C4D" # Guild unique ID in format XXXXXXX
 key = "B8DAE20A-5B00-CD4F-A202-58516B6FE5EAD9120EEA-04D0-4570-A320-86EB927E0356" # API Key from top guild rank with the "guilds" permission
 member_role = "KnT" # Name of the role guild members go in
 create_roles = true # Have the bot create roles for each rank.  If false, members will only be assigned to their rank role if it exists.
-motd_channel = "" # Will set the channel description to the guild motd
+motd_channel = "knt-professional-guild" # Will set the channel description to the guild motd
 motd_convert_urls = true # Convert urls in the guild motd to actual urls that discord parses to a link, if they don't start with e.g. "http://"
 motd_excluded_subdomains = [ # An array of url subdomains of which the url should not be converted (these are regular expressions)
   "[^\\.]*ts[^\\.]*", # *ts*.example.com
   "[^\\.]*teamspeak[^\\.]*" # *teamspeak*.example.com
 ]
+kicks_channel = "kicks"
+
+[autoinvite]
+channel = "273260848041033728"
+role = "273264354642755585"
 
 [discord]
 clientid = "261654426584875010" # Used to generate a link to add the bot to a server
@@ -36,5 +41,5 @@ port = "3000"
 
 [features]
 # Add "web" to turn on the web server
-enabled = ["ranks", "wvw_score", "progression", "builds", "wiki", "session", "whois", "li", "alternate"]
+enabled = ["ranks", "wvw_score", "motd", "kicks", "progression", "builds", "wiki", "session", "whois", "li", "alternate", "autoinvite"]
 prefix = "gw2!"
