@@ -23,6 +23,7 @@ module.exports = function(bot) {
         console.log("Kicks called. lastID = " + lastID);
         gw2.on('/v2/guild/'+guild_id+'/log?since='+lastID, (log, key, from_cache) => {
             //if (from_cache) return;
+            console.log("Kicks called in function.");
 
             var kicks = log.filter(l => (l.type === 'kick')),
                 channel = bot.channels.find('name', channel_name),
