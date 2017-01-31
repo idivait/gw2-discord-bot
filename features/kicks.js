@@ -20,6 +20,7 @@ module.exports = function(bot) {
 	}
     db.getObjectAsync('lastid').then((lastID)=>{
         // Update motd every time the guild log is requested
+        console.log("Kicks called. lastID = " + lastID);
         gw2.on('/v2/guild/'+guild_id+'/log?since='+lastID, (log, key, from_cache) => {
             //if (from_cache) return;
 
