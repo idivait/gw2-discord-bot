@@ -5,8 +5,8 @@ var
 	config = require('config'),
 	gw2 = require('../lib/gw2'),
 	phrases = require('../lib/phrases'),
-    db = Promise.promisifyAll(require('../lib/db'))
-    //lastID = '2227519'
+    db = Promise.promisifyAll(require('../lib/db')),
+    defaultLastID = '2227519'
 ;
 
 var guild_id = config.has('guild.id') ? config.get('guild.id') : null;
@@ -20,6 +20,7 @@ module.exports = function(bot) {
 	}
     db.getObjectAsync('lastid').then((lastID)=>{
         // Update motd every time the guild log is requested
+        if (!lastID) lastID = defaultLastID
         console.log("Kicks called. lastID = " + lastID);
         gw2.on('/v2/guild/'+guild_id+'/log?since='+lastID, (log, key, from_cache) => {
             //if (from_cache) return;
@@ -48,7 +49,7 @@ module.exports = function(bot) {
                 });
             });
             db.setObjectAsync('lastid', log[0].id).then(()=>{
-                console.log("lastid updated");
+                console.log("lastid updated: " + log[0].id);
             });
         });
 
